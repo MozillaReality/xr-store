@@ -1,0 +1,30 @@
+{
+  "name": "xr-store",
+  "version": "0.0.1",
+  "description": "Progressive XR demo",
+  "scripts": {
+    "atlas": "spritesheet-js --name ui_atlas --path assets/images sprites/*.png",
+    "build": "cross-env NODE_ENV=production webpack",
+    "start": "webpack-dev-server --host 0.0.0.0",
+    "lint": "semistandard -v | snazzy"
+  },
+  "repository": "arturitu/xr-store",
+  "license": "MIT",
+  "semistandard": {
+    "ignore": [
+      "**/vendor/**"
+    ]
+  },
+  "devDependencies": {
+    "cross-env": "^2.0.1",
+    "json-loader": "^0.5.7",
+    "semistandard": "^9.0.0",
+    "snazzy": "^4.0.1",
+    "spritesheet-js": "^1.2.6",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.16.1"
+  },
+  "dependencies": {
+    "aframe-xr": "0.0.9"
+  }
+}
