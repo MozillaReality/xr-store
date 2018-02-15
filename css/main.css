@@ -31,7 +31,7 @@ a{
   border-bottom: 1px solid #cccccc;
 }
 #header.ar{
-  padding-top: 30px;
+  padding-top: 20px;
   border-bottom: 1px solid #999999;
 }
 #body {
@@ -104,15 +104,15 @@ a{
 }
 #productOptions.ar {
   float: auto;
-  text-align: center;
+  display: flex;
+  justify-content: center;
   width: 100%;
 }
 .productOption {
   margin-bottom: 20px;
 }
 .productOption.ar {
-  width: 200px;
-  display: inline-block;
+  width: 160px;
   margin-right: 0;
 }
 
@@ -238,6 +238,6 @@ a{
   }
   .productOption {
     float: left;
-    margin-right: 30px;
+    margin-right: 25px;
   }
 }
