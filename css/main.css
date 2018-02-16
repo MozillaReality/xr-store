@@ -44,8 +44,9 @@ a{
 }
 #cart {
   float: right;
+  font-family: 'Open Sans', sans-serif;
   position: relative;
-  top: 35px;
+  top: 30px;
 }
 
 #upperSheet {
@@ -98,6 +99,7 @@ a{
 #content3D.ar {
   border: 0;
 }
+
 #productOptions {
   float: left;
   width: 30%;
@@ -131,11 +133,12 @@ a{
 }
 .productOptionThumbs li{
   display: inline;
+  cursor: pointer;
 }
 .productOptionThumbs li img{
+  user-select: none;
   width: 48px;
   height: 48px;
-  cursor: pointer;
 }
 
 .optionSelected {

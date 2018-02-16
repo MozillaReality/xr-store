@@ -24,9 +24,9 @@
         <div id="upperSheet">
           <div id="visualSheet">
               <div id="thumbs">
-                <div class="thumb"><img src="assets/images/thumbs1.png"/></div>
-                <div class="thumb"><img src="assets/images/thumbs2.png"/></div>
-                <div class="thumb last selected"><img src="assets/images/thumbs3.png"/></div>
+                <div id="thumb0" class="thumb"><img src="assets/images/thumbs-0-0-0.png"/></div>
+                <div id="thumb1" class="thumb"><img src="assets/images/thumbs-0-0-1.png"/></div>
+                <div id="thumb2" class="thumb last selected"><img src="assets/images/thumbs-0-0-2.png"/></div>
               </div>
               <div id="content3D">
                 <a-scene embedded xr="arAutostart: false">
@@ -34,8 +34,8 @@
                     <img id="skymap" src="assets/images/sky.jpg" crossorigin="anonymous">
                     <img id="floor" src="assets/images/floor.jpg" crossorigin="anonymous">
                   </a-assets>
-                  <a-light type="point" light="color: #fff; intensity:0.6" position="3 10 1"></a-light>
-                  <a-light type="point" light="color: #fff; intensity:0.2" position="-3 -10 0"></a-light>
+                  <a-light type="point" light="color: #fff; intensity:0.5" position="3 10 1"></a-light>
+                  <a-light type="point" light="color: #fff; intensity:0.1" position="-3 10 0"></a-light>
                   <a-light type="hemisphere" groundColor="#888" intensity="0.8"></a-light>
             
                   <a-entity id="ground"
@@ -45,8 +45,12 @@
                   <a-entity id="cameraRig">
                     <!-- camera -->
                     <a-entity id="acamera" camera position="0 1 -2" orbit-controls></a-entity>
-                    <!-- Mesh -->
-                    <a-entity class="collidable" id="mainMesh" geometry="box" material="color: #66ca9c" rotation="0 30 0" position="0 0.6 0"></a-entity>
+                    <!-- Meshes -->
+                    <a-entity class="collidable" id="meshContainer" position="0 0.75 0">
+                        <a-entity id="geo0" geometry="primitive: box" material="color: #66ca9c" rotation="0 30 0" visible="true"></a-entity>
+                        <a-entity id="geo1" geometry="primitive: sphere; radius: 0.75" material="color: #66ca9c" visible="false"></a-entity>
+                        <a-entity id="geo2" geometry="primitive: cone; radiusBottom: 0.75; segmentsRadial: 4" rotation="0 15 0" material="color: #66ca9c" visible="false"></a-entity>
+                    </a-entity>
                     <!-- hand controls -->
                     <a-entity id="left-hand" store-controls="hand: left" laser-controls="hand: left" raycaster="objects: .collidable" xr="ar: false"></a-entity>
                     <a-entity id="right-hand" store-controls="hand: right" laser-controls="hand: right" raycaster="objects: .collidable" line="color: #118A7E" xr="ar: false"></a-entity>
@@ -63,14 +67,14 @@
                 </div>
                 <div class="productOptionThumbs">
                   <ul>
-                    <li class="optionSelected">
+                    <li id="shape0" class="optionSelected">
+                        <img src="assets/images/shape0.png"/>
+                    </li>
+                    <li id="shape1">
                         <img src="assets/images/shape1.png"/>
                     </li>
-                    <li>
+                    <li id="shape2">
                         <img src="assets/images/shape2.png"/>
-                    </li>
-                    <li>
-                        <img src="assets/images/shape3.png"/>
                     </li>
                   </ul>
                 </div>
@@ -81,14 +85,14 @@
                 </div>
                 <div class="productOptionThumbs">
                   <ul>
-                    <li>
+                    <li id="color0" class="optionSelected">
+                        <img src="assets/images/color0.png"/>
+                    </li>
+                    <li id="color1">
                         <img src="assets/images/color1.png"/>
                     </li>
-                    <li>
+                    <li id="color2">
                         <img src="assets/images/color2.png"/>
-                    </li>
-                    <li class="optionSelected">
-                        <img src="assets/images/color3.png"/>
                     </li>
                   </ul>
                 </div>
