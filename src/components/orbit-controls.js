@@ -45,7 +45,9 @@ AFRAME.registerComponent('orbit-controls', {
   },
   
   tick: function () {
-    this.controls.update();
+    if (this.controls.enabled) {
+      this.controls.update();
+    }
   },
 
   setupControls: function() {

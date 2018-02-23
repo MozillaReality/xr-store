@@ -7,7 +7,11 @@
     <link rel="icon" href="img/icon-256.png">
     <meta name="description" content="A progressive XR demo. Powered by A-Frame.">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-    <script src="vendor/aframe-master.js"></script>
+    <script src="vendor/aframe-master-custom.js"></script>
+    <!-- <script src="https://rawgit.com/aframevr/aframe/master/dist/aframe-master.js"></script> -->
+    <!-- <script src="https://aframe.io/releases/0.7.0/aframe.min.js"></script> -->
+    <script src="vendor/three.xr.js"></script>
+    <script src="vendor/aframe-xr.js"></script>
     <script src="vendor/aframe-input-mapping-component.js"></script>
     <script src="build.js"></script>
     <link rel="stylesheet" href="css/main.css">
@@ -44,17 +48,17 @@
                           </a-entity>
                   <a-entity id="cameraRig">
                     <!-- camera -->
-                    <a-entity id="acamera" camera position="0 1 -2" orbit-controls></a-entity>
-                    <!-- Meshes -->
-                    <a-entity class="collidable" id="meshContainer" position="0 0.75 0">
-                        <a-entity id="geo0" geometry="primitive: box" material="color: #66ca9c" rotation="0 30 0" visible="true"></a-entity>
-                        <a-entity id="geo1" geometry="primitive: sphere; radius: 0.75" material="color: #66ca9c" visible="false"></a-entity>
-                        <a-entity id="geo2" geometry="primitive: cone; radiusBottom: 0.75; segmentsRadial: 4" rotation="0 15 0" material="color: #66ca9c" visible="false"></a-entity>
-                    </a-entity>
+                    <a-entity id="acamera" camera position="0 1.4 0" look-controls></a-entity>
                     <!-- hand controls -->
                     <a-entity id="left-hand" store-controls="hand: left" laser-controls="hand: left" raycaster="objects: .collidable" xr="ar: false"></a-entity>
                     <a-entity id="right-hand" store-controls="hand: right" laser-controls="hand: right" raycaster="objects: .collidable" line="color: #118A7E" xr="ar: false"></a-entity>
                   </a-entity>
+                  <!-- Meshes -->
+                  <a-entity class="collidable" id="meshContainer" position="0 0.75 -2.5">
+                    <a-entity id="geo0" geometry="primitive: box" material="color: #66ca9c" rotation="0 30 0" visible="true"></a-entity>
+                    <a-entity id="geo1" geometry="primitive: sphere; radius: 0.75" material="color: #66ca9c" visible="false"></a-entity>
+                    <a-entity id="geo2" geometry="primitive: cone; radiusBottom: 0.75; segmentsRadial: 4" rotation="0 15 0" material="color: #66ca9c" visible="false"></a-entity>
+                </a-entity>
                   <a-entity id="sky" geometry="primitive:sphere; radius:30; phiLength:360; phiStart:0; thetaLength:90" material="shader:flat; side:back; height:2048; src:#skymap; width:2048" xr="ar: false"></a-entity>
                   <a-entity id="skyFloor" geometry="primitive:sphere; radius:30; phiLength:360; phiStart:0; thetaLength:90; thetaStart: 90" material="shader:flat; color: white; side:back; height:2048; width:2048" xr="ar: false"></a-entity>
                 </a-scene>

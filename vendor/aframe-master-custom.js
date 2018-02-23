@@ -70384,8 +70384,8 @@ module.exports.Component = registerComponent('vr-mode-ui', {
     this.enterVREl = createEnterVRButton(this.onEnterVRButtonClick);
     sceneEl.appendChild(this.enterVREl);
 
-    this.orientationModalEl = createOrientationModal(this.onModalClick);
-    sceneEl.appendChild(this.orientationModalEl);
+    // this.orientationModalEl = createOrientationModal(this.onModalClick);
+    // sceneEl.appendChild(this.orientationModalEl);
 
     this.updateEnterVRInterface();
   },
@@ -76101,8 +76101,10 @@ module.exports.AScene = registerElement('a-scene', {
         // Handle exiting VR if not yet already and in a headset or polyfill.
         if (!fromExternal && (this.checkHeadsetConnected() || this.isMobile)) {
           this.renderer.vr.enabled = false;
-          vrDisplay = utils.device.getVRDisplay();
-          return vrDisplay.exitPresent().then(exitVRSuccess, exitVRFailure);
+					vrDisplay = utils.device.getVRDisplay();
+					if(vrDisplay.isPresenting){
+						return vrDisplay.exitPresent().then(exitVRSuccess, exitVRFailure);
+					}
         }
 
         // Handle exiting VR in all other cases (2D fullscreen, external exit VR event).
