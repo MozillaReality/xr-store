@@ -58,8 +58,10 @@ AFRAME.registerSystem('store', {
       // this.sceneEl.setAttribute('vr-mode-ui', {enabled: false});
       self.flatMaterials();
       self.addStorePanel();
+      self.hasVRDisplays = false;
       navigator.getVRDisplays().then(function (displays) {
         if (displays.length) {
+          self.hasVRDisplays = true;
           self.replaceVRIcon();
         }
       });
@@ -72,7 +74,6 @@ AFRAME.registerSystem('store', {
     }
   },
   changeReality: function () {
-    console.log('----- change', this.pinDetected, this.pinSelected);
     var productOptionArr = document.getElementsByClassName('productOption');
     switch (this.currentReality) {
       case 'ar':
@@ -132,11 +133,14 @@ AFRAME.registerSystem('store', {
         this.meshContainer.setAttribute('visible', true);
         this.meshContainer.setAttribute('position', this.meshContainerOrigPosition);
         this.pinSelected = false;
-        this.reticleParent.appendChild(this.reticle);
+        if (this.reticleParent) {
+          this.reticleParent.appendChild(this.reticle);
+        }
         this.reticle.setAttribute('visible', false);
+        this.storePanelVR.setAttribute('visible', false);
         break;
       case 'vr':
-        
+        this.storePanelVR.setAttribute('visible', true);
         break;
     }
   },
@@ -149,10 +153,16 @@ AFRAME.registerSystem('store', {
     document.getElementById('thumb1').addEventListener('click', this.thumb1Clicked.bind(this));
     document.getElementById('thumb2').addEventListener('click', this.thumb2Clicked.bind(this));
     
+    this.shape0Clicked = this.shape0Clicked.bind(this);
+    this.shape1Clicked = this.shape1Clicked.bind(this);
+    this.shape2Clicked = this.shape2Clicked.bind(this);
     document.getElementById('shape0').addEventListener('click', this.shape0Clicked.bind(this));
     document.getElementById('shape1').addEventListener('click', this.shape1Clicked.bind(this));
     document.getElementById('shape2').addEventListener('click', this.shape2Clicked.bind(this));
 
+    this.color0Clicked = this.color0Clicked.bind(this);
+    this.color1Clicked = this.color1Clicked.bind(this);
+    this.color2Clicked = this.color2Clicked.bind(this);
     document.getElementById('color0').addEventListener('click', this.color0Clicked.bind(this));
     document.getElementById('color1').addEventListener('click', this.color1Clicked.bind(this));
     document.getElementById('color2').addEventListener('click', this.color2Clicked.bind(this));
@@ -186,12 +196,15 @@ AFRAME.registerSystem('store', {
   },
   shape0Clicked: function (evt) {
     this.changeShape(0);
+    document.querySelector('#shapeBar-vr').getAttribute('position').x = -0.75;
   },
   shape1Clicked: function (evt) {
     this.changeShape(1);
+    document.querySelector('#shapeBar-vr').getAttribute('position').x = -0.5;
   },
   shape2Clicked: function (evt) {
     this.changeShape(2);
+    document.querySelector('#shapeBar-vr').getAttribute('position').x = -0.25;
   },
   changeShape: function (i) {
     document.querySelector('#geo0').setAttribute('visible', false);
@@ -205,12 +218,15 @@ AFRAME.registerSystem('store', {
   },
   color0Clicked: function (evt) {
     this.changeColor(0);
+    document.querySelector('#colorBar-vr').getAttribute('position').x = 0.25;
   },
   color1Clicked: function (evt) {
     this.changeColor(1);
+    document.querySelector('#colorBar-vr').getAttribute('position').x = 0.5;
   },
   color2Clicked: function (evt) {
     this.changeColor(2);
+    document.querySelector('#colorBar-vr').getAttribute('position').x = 0.75;
   },
   changeColor: function (i) {
     document.getElementById('color' + this.colorSelected).classList.remove('optionSelected');
@@ -239,12 +255,18 @@ AFRAME.registerSystem('store', {
       document.getElementById('cart').style.fontWeight = 'normal';
       document.getElementById('buttonCart').innerHTML = 'Add to cart';
       document.getElementById('buttonCart').style.backgroundColor = '#181818';
+      document.querySelector('#addBtn-vr-bg').setAttribute('initialColor', '#181818');
+      document.querySelector('#addBtn-vr-text').setAttribute('text', {value: 'Add to cart'});
+      document.querySelector('#cart-vr').setAttribute('text', {value: '(0) Cart'});
     } else {
       document.getElementById('cart').innerHTML = '(1) Cart';
       document.getElementById('cart').style.color = '#b7374c';
       document.getElementById('cart').style.fontWeight = 'bolder';
       document.getElementById('buttonCart').innerHTML = 'Added!';
       document.getElementById('buttonCart').style.backgroundColor = '#b7374c';
+      document.querySelector('#addBtn-vr-bg').setAttribute('initialColor', '#b7374c');
+      document.querySelector('#addBtn-vr-text').setAttribute('text', {value: 'Added!'});
+      document.querySelector('#cart-vr').setAttribute('text', {value: '(1) Cart'});
     }
     this.isAdded = !this.isAdded;
   },
@@ -259,6 +281,8 @@ AFRAME.registerSystem('store', {
     containerUI.setAttribute('id', 'storePanel');
     containerUI.setAttribute('position', '1.5 1.7 -2.75');
     containerUI.setAttribute('rotation', '0 -30 0');
+    containerUI.setAttribute('visible', false);
+    this.storePanelVR = containerUI;
     this.el.sceneEl.appendChild(containerUI);
 
     this.addPlane({
@@ -310,6 +334,7 @@ AFRAME.registerSystem('store', {
       size: 0.25,
       position: '-0.75 0 0.01',
       collidable: true,
+      onclick: this.shape0Clicked,
       parent: containerUI
     });
     this.addImage({
@@ -318,6 +343,7 @@ AFRAME.registerSystem('store', {
       size: 0.25,
       position: '-0.5 0 0.01',
       collidable: true,
+      onclick: this.shape1Clicked,
       parent: containerUI
     });
     this.addImage({
@@ -326,6 +352,7 @@ AFRAME.registerSystem('store', {
       size: 0.25,
       position: '-0.25 0 0.01',
       collidable: true,
+      onclick: this.shape2Clicked,
       parent: containerUI
     });
     this.addPlane({
@@ -352,6 +379,7 @@ AFRAME.registerSystem('store', {
       size: 0.25,
       position: '0.25 0 0.01',
       collidable: true,
+      onclick: this.color0Clicked,
       parent: containerUI
     });
     this.addImage({
@@ -360,6 +388,7 @@ AFRAME.registerSystem('store', {
       size: 0.25,
       position: '0.5 0 0.01',
       collidable: true,
+      onclick: this.color1Clicked,
       parent: containerUI
     });
     this.addImage({
@@ -368,6 +397,7 @@ AFRAME.registerSystem('store', {
       size: 0.25,
       position: '0.75 0 0.01',
       collidable: true,
+      onclick: this.color2Clicked,
       parent: containerUI
     });
     this.addPlane({
@@ -386,14 +416,6 @@ AFRAME.registerSystem('store', {
       size: 1.2,
       color: '#181818',
       position: '-0.25 -0.3 0',
-      parent: containerUI
-    });
-    this.addPlane({
-      id: 'colorBar-vr',
-      width: 0.2,
-      height: 0.01,
-      position: '0.25 -0.15 0.01',
-      color: '#181818',
       parent: containerUI
     });
     this.addButton({
@@ -415,6 +437,7 @@ AFRAME.registerSystem('store', {
       width: params.width,
       height: params.height
     });
+    uiEl.setAttribute('id', params.id);
     uiEl.setAttribute('position', params.position || '0 0 0');
     uiEl.setAttribute('material', {
       shader: 'flat',
@@ -424,6 +447,7 @@ AFRAME.registerSystem('store', {
     });
     if (params.collidable) {
       uiEl.setAttribute('class', 'collidable');
+      uiEl.setAttribute('intersect-color-change', '');
     }
     params.parent.appendChild(uiEl);
   },
@@ -445,6 +469,7 @@ AFRAME.registerSystem('store', {
     });
     if (params.collidable) {
       uiEl.setAttribute('class', 'collidable');
+      uiEl.setAttribute('intersect-color-change', '');
     }
     uiEl.setAttribute('position', params.position || '0 0 0');
     params.parent.appendChild(uiEl);
@@ -458,6 +483,11 @@ AFRAME.registerSystem('store', {
       width: params.size,
       height: params.size
     });
+    if (params.onclick) {
+      uiEl.addEventListener('mousedown', function (evt) {
+        params.onclick();
+      });
+    }
     uiEl.setAttribute('material', {
       shader: 'flat',
       transparent: true,
@@ -465,6 +495,7 @@ AFRAME.registerSystem('store', {
     });
     if (params.collidable) {
       uiEl.setAttribute('class', 'collidable');
+      uiEl.setAttribute('intersect-color-change', '');
     }
     uiEl.setAttribute('position', params.position || '0 0 0');
     params.parent.appendChild(uiEl);
@@ -474,12 +505,17 @@ AFRAME.registerSystem('store', {
     uiEl.setAttribute('id', params.id);
     params.parent.appendChild(uiEl);
     uiEl.setAttribute('position', params.position || '0 0 0');
-    uiEl.setAttribute('onclick', params.onclick);
+    if (params.onclick) {
+      uiEl.addEventListener('mousedown', function (evt) {
+        params.onclick();
+      });
+    }
     this.addPlane({
       id: params.id + '-bg',
       width: params.width,
       height: params.height,
       color: params.color,
+      collidable: true,
       parent: uiEl
     });
     this.addText({
@@ -490,6 +526,7 @@ AFRAME.registerSystem('store', {
       position: '0 -0.05 0',
       size: 1.4,
       color: params.textColor,
+      collidable: true,
       parent: uiEl
     });
   },
@@ -545,6 +582,9 @@ AFRAME.registerSystem('store', {
     sheet.innerHTML += 'margin-right: 5px;}';
     sheet.innerHTML += '.a-enter-vr-button:active,.a-enter-vr-button:hover {background-color: rgba(0,0,0,0);opacity: 0.5}';
     document.body.appendChild(sheet);
+    if (this.hasVRDisplays) {
+      this.replaceVRIcon();
+    }
   },
   replaceVRIcon: function () {
     var sheet = document.createElement('style');
@@ -565,7 +605,7 @@ AFRAME.registerSystem('store', {
     document.body.appendChild(sheet);
   },
   planeDetected: function () {
-    console.log('----- plane detected', this.pinDetected, this.pinSelected);
+    // console.log('----- plane detected', this.pinDetected, this.pinSelected);
     if (this.pinSelected) {
       this.showARUI();
     } else {
