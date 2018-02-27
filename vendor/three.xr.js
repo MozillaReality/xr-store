@@ -11008,7 +11008,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
           // Perform a hit test using the ARCore data
           var _hits = this._vrDisplay.hitTest(normalizedScreenX, normalizedScreenY);
           for (var _i = 0; _i < _hits.length; _i++) {
-            _hits[_i].transform[13] += _XRViewPose2.default.SITTING_EYE_HEIGHT;
+            _hits[_i].modelMatrix[13] += _XRViewPose2.default.SITTING_EYE_HEIGHT;
           }
           if (_hits.length == 0) {
             return null;

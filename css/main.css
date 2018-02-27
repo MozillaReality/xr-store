@@ -221,7 +221,8 @@ a{
   height: 100%;
   z-index: 999;
 }
-#arui-step1 {
+#arui-step1 .arui-text {
+  width: 250px;
 }
 #arui-device-icon {
 }
