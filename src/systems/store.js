@@ -61,8 +61,12 @@ AFRAME.registerSystem('store', {
       self.hasVRDisplays = false;
       navigator.getVRDisplays().then(function (displays) {
         if (displays.length) {
-          self.hasVRDisplays = true;
-          self.replaceVRIcon();
+          if (displays[0].displayName.indexOf('Cardboard') !== -1) {
+            self.hideVRIcon();
+          } else {
+            self.hasVRDisplays = true;
+            self.replaceVRIcon();
+          }
         }
       });
     });
@@ -585,6 +589,11 @@ AFRAME.registerSystem('store', {
     if (this.hasVRDisplays) {
       this.replaceVRIcon();
     }
+  },
+  hideVRIcon: function (){
+    var sheet = document.createElement('style');
+    sheet.innerHTML = '.a-enter-vr {display: none;}';
+    document.body.appendChild(sheet);
   },
   replaceVRIcon: function () {
     var sheet = document.createElement('style');
