@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "Progressive XR demo",
   "scripts": {
-    "atlas": "spritesheet-js --name ui_atlas --path assets/images sprites/*.png",
     "build": "cross-env NODE_ENV=production webpack",
     "start": "webpack-dev-server --host 0.0.0.0",
     "lint": "semistandard -v | snazzy"

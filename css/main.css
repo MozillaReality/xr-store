@@ -60,7 +60,7 @@ a{
   display: table-cell;
 }
 #visualSheet.ar {
-  display: none;
+  /* display: none; */
 }
 #thumbs {
   float: left;
@@ -106,10 +106,11 @@ a{
   width: 30%;
 }
 #productOptions.ar {
-  float: auto;
-  display: flex;
   justify-content: center;
+  position: fixed;
   width: 100%;
+  right: 0;
+  display: flex;
 }
 .productOption {
   margin-bottom: 20px;
@@ -213,6 +214,60 @@ a{
   line-height: 50px;
 }
 
+#arui {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+}
+#arui-step1 {
+}
+#arui-device-icon {
+}
+#arui-device-icon img{
+  animation: move-around 4s infinite;
+  width: 128px;
+  height: 128px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  position: absolute;
+}
+@keyframes move-around{
+  0% {
+    left: 40%;
+    top: 50%;
+  }
+  25% {
+    left: 60%;
+    top: 50%;
+  }
+  50% {
+    left: 50%;
+    top: 60%;
+  }
+  75% {
+    left: 50%;
+    top: 40%;
+  }
+  100% {
+    left: 40%;
+    top: 50%;
+  }
+}
+.arui-text {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255,255,255,.7);
+  color: #181818;
+  padding: 5px 10px;
+}
+#arui-step2 {
+  display: none;
+}
 @media (max-width: 799px) {
   #upperSheet {
     width: auto;

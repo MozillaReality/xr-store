@@ -19,6 +19,15 @@
     <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
   </head>
   <body>
+  <div id="arui">
+      <div id="arui-step1">
+          <div id="arui-device-icon"><img src="assets/images/device-icon.png"/></div>
+          <div class="arui-text">Move around to detect a surface</div>
+      </div>
+      <div id="arui-step2">
+          <div class="arui-text">Tap to place</div>
+      </div>
+    </div>
     <div id="container">
       <div id="header">
           <div id="title"><h1>XR Mesh Store</h1></div>
@@ -48,19 +57,20 @@
                           </a-entity>
                   <a-entity id="cameraRig">
                     <!-- camera -->
-                    <a-entity id="acamera" camera position="0 1.4 0" look-controls></a-entity>
+                    <a-entity id="acamera" camera position="0 1.2 0" look-controls></a-entity>
                     <!-- hand controls -->
                     <a-entity id="left-hand" store-controls="hand: left" laser-controls="hand: left" raycaster="objects: .collidable" xr="ar: false"></a-entity>
                     <a-entity id="right-hand" store-controls="hand: right" laser-controls="hand: right" raycaster="objects: .collidable" line="color: #118A7E" xr="ar: false"></a-entity>
                   </a-entity>
                   <!-- Meshes -->
-                  <a-entity class="collidable" id="meshContainer" position="0 0.75 -2.5">
-                    <a-entity id="geo0" geometry="primitive: box" material="color: #66ca9c" rotation="0 30 0" visible="true"></a-entity>
-                    <a-entity id="geo1" geometry="primitive: sphere; radius: 0.75" material="color: #66ca9c" visible="false"></a-entity>
-                    <a-entity id="geo2" geometry="primitive: cone; radiusBottom: 0.75; segmentsRadial: 4" rotation="0 15 0" material="color: #66ca9c" visible="false"></a-entity>
+                  <a-entity class="collidable" id="meshContainer" position="0 0.75 -1.25">
+                    <a-entity id="geo0" geometry="primitive: box; width: 0.5; height: 0.5; depth: 0.5" material="color: #66ca9c" rotation="0 30 0" visible="true"></a-entity>
+                    <a-entity id="geo1" geometry="primitive: sphere; radius: 0.35" material="color: #66ca9c" visible="false"></a-entity>
+                    <a-entity id="geo2" geometry="primitive: cone; radiusBottom: 0.35; height: 0.5; segmentsRadial: 4" rotation="0 15 0" material="color: #66ca9c" visible="false"></a-entity>
                 </a-entity>
                   <a-entity id="sky" geometry="primitive:sphere; radius:30; phiLength:360; phiStart:0; thetaLength:90" material="shader:flat; side:back; height:2048; src:#skymap; width:2048" xr="ar: false"></a-entity>
                   <a-entity id="skyFloor" geometry="primitive:sphere; radius:30; phiLength:360; phiStart:0; thetaLength:90; thetaStart: 90" material="shader:flat; color: white; side:back; height:2048; width:2048" xr="ar: false"></a-entity>
+                  <a-entity reticle geometry="primitive: ring; radiusInner: 0.04; radiusOuter: 0.05" material="color: #ffffff"></a-entity>
                 </a-scene>
               </div>
             </div>

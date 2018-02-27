@@ -156,9 +156,10 @@ THREE.WebXRManager = function () {
     this.renderer.autoClear = false;
     this.renderer.setSize(this.session.baseLayer.framebufferWidth, this.session.baseLayer.framebufferHeight, false);
     this.renderer.clear();
-    this.poseObject.matrixAutoUpdate = false;
-    this.poseObject.matrix.fromArray(headPose.poseModelMatrix);
-    this.poseObject.updateMatrixWorld(true);
+    this.poseTarget.matrixAutoUpdate = false;
+    this.poseTarget.matrix.fromArray(headPose.poseModelMatrix);
+    this.poseTarget.matrix.decompose(this.poseTarget.position, this.poseTarget.quaternion, this.poseTarget.scale);
+    this.poseTarget.updateMatrixWorld(true);
     if (this.sessionActive) {
       // Render each view into this.session.baseLayer.context
       for (var i = 0; i < frame.views.length; i++) {
@@ -209,11 +210,11 @@ THREE.WebXRManager = function () {
       _this.domElementOriginal = renderer.domElement.parentNode;
       _this.cameraCloned = _this.camera.clone();
       if (_this.camera.parent && _this.camera.parent.type !== 'Scene') {
-        _this.poseObject = _this.camera.parent;
+        _this.poseTarget = _this.camera.parent;
       } else {
-        _this.poseObject = _this.camera;
+        _this.poseTarget = _this.camera;
       }
-      _this.poseObjectCloned = _this.poseObject.clone();
+      _this.poseTargetCloned = _this.poseTarget.clone();
       // Handle session lifecycle events
       session.addEventListener('focus', function (ev) {
         _this.handleSessionFocus(ev);
@@ -259,7 +260,9 @@ THREE.WebXRManager = function () {
       this.sessions.push(this.session);
       this.sessionActive = true;
     }
-    document.getElementsByClassName('webxr-sessions')[0].style.display = 'block';
+    if (document.getElementsByClassName('webxr-sessions')[0]) {
+      document.getElementsByClassName('webxr-sessions')[0].style.display = 'block';
+    }
     this.dispatchEvent({ type: 'sessionStarted', session: this.session });
   };
 
@@ -267,15 +270,14 @@ THREE.WebXRManager = function () {
     this.session.end();
     this.dispatchEvent({ type: 'sessionEnded', session: this.session });
     this.sessionActive = false;
-    console.log('----');
-    // if (this.session._display._vrDisplay && this.session._display.isPresenting) {
-    //   renderer.vr.enabled = false;
-    //   this.session._display._vrDisplay.exitPresent();
-    // }
+    if (this.session._display._vrDisplay && this.session._display.isPresenting) {
+      renderer.vr.enabled = false;
+      this.session._display._vrDisplay.exitPresent();
+    }
     this.domElementOriginal.appendChild(this.session.baseLayer._context.canvas);
-    this.poseObject.matrixAutoUpdate = false;
-    this.poseObject.matrix.copy(this.poseObjectCloned.matrix);
-    this.poseObject.updateMatrixWorld(true);
+    this.poseTarget.matrixAutoUpdate = false;
+    this.poseTarget.matrix.copy(this.poseTargetCloned.matrix);
+    this.poseTarget.updateMatrixWorld(true);
     this.camera.matrixWorldInverse.copy(this.cameraCloned.matrixWorldInverse);
     this.camera.projectionMatrix.copy(this.cameraCloned.projectionMatrix);
     this.camera.updateProjectionMatrix();
@@ -433,7 +435,7 @@ THREE.WebXRUtils = {
           resolve(displays);
 
           function isAppleWebView() {
-            return navigator.userAgent.indexOf('AppleWebKit') && navigator.userAgent.indexOf('Safari') === -1;
+            return navigator.userAgent.indexOf('AppleWebKit') !== -1 && navigator.userAgent.indexOf('Safari') === -1;
           }
 
           function isMobileDevice() {
@@ -2946,6 +2948,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
             resolve();
             return;
           }
+          console.log('----STOP');
           window.webkit.messageHandlers.stopAR.postMessage({
             callback: _this5._createPromiseCallback('stop', resolve)
           });
@@ -2989,6 +2992,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
           options: options,
           callback: this._globalCallbacksMap.onWatch
         };
+        console.log('----WATCH');
         window.webkit.messageHandlers.watchAR.postMessage(data);
         return true;
       }
@@ -3042,6 +3046,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
       key: "_sendInit",
       value: function _sendInit(options) {
         // get device id
+        console.log('----INIT');
         window.webkit.messageHandlers.initAR.postMessage({
           options: options,
           callback: this._globalCallbacksMap.onInit
@@ -3136,7 +3141,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
                   id: _element2.uuid,
                   center: _element2.h_plane_center,
                   extent: [_element2.h_plane_extent.x, _element2.h_plane_extent.z],
-                  transform: _element2.transform
+                  modelMatrix: _element2.transform
                 });
               } else {
                 plane.center = _element2.h_plane_center;
@@ -3148,7 +3153,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               if (!anchor) {
                 this.anchors_.set(_element2.uuid, {
                   id: _element2.uuid,
-                  transform: _element2.transform
+                  modelMatrix: _element2.transform
                 });
               } else {
                 anchor.transform = _element2.transform;
@@ -4798,12 +4803,18 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
         el.style.height = '100%';
       }
 
-      document.addEventListener('DOMContentLoaded', function () {
+      var prependElements = function prependElements() {
         document.body.style.width = '100%';
         document.body.style.height = '100%';
         document.body.prepend(_this._sessionEls);
         document.body.prepend(_this._realityEls); // realities must render behind the sessions
-      });
+      };
+
+      if (document.readyState !== 'loading') {
+        prependElements();
+      } else {
+        document.addEventListener('DOMContentLoaded', prependElements);
+      }
       return _this;
     }
 
@@ -10997,7 +11008,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
           // Perform a hit test using the ARCore data
           var _hits = this._vrDisplay.hitTest(normalizedScreenX, normalizedScreenY);
           for (var _i = 0; _i < _hits.length; _i++) {
-            _hits[_i].modelMatrix[13] += _XRViewPose2.default.SITTING_EYE_HEIGHT;
+            _hits[_i].transform[13] += _XRViewPose2.default.SITTING_EYE_HEIGHT;
           }
           if (_hits.length == 0) {
             return null;

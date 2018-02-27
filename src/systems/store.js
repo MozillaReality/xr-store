@@ -34,13 +34,22 @@ AFRAME.registerSystem('store', {
         }
       }
     };
+    this.pinDetected = false;
+    this.pinSelected = false;
     this.colorArr = [0x66ca9c, 0xfa5784, 0x4db5d1];
     this.currentReality = 'magicWindow';
+    this.meshContainer = document.querySelector('#meshContainer');
+    this.meshContainerOrigPosition = this.meshContainer.getAttribute('position');
+    this.reticle = document.querySelector('[reticle]');
+    this.planeDetected = this.planeDetected.bind(this);
+    this.touched = this.touched.bind(this);
+    this.reticle.addEventListener('planeDetected', this.planeDetected);
+    this.reticle.addEventListener('touched', this.touched);
     // this.el.sceneEl.setAttribute('vr-mode-ui', {enabled: false});
     this.el.sceneEl.addEventListener('realityChanged', this.realityChanged.bind(this));
+    this.el.sceneEl.addEventListener('xrInitialized', this.xrInitialized.bind(this));
     this.addEvents();
     var self = this;
-    this.addNewStyles();
     this.sceneEl.addEventListener('loaded', function () {
       AFRAME.registerInputMappings(mappings);
       AFRAME.currentInputMapping = 'store';
@@ -63,6 +72,7 @@ AFRAME.registerSystem('store', {
     }
   },
   changeReality: function () {
+    console.log('----- change', this.pinDetected, this.pinSelected);
     var productOptionArr = document.getElementsByClassName('productOption');
     switch (this.currentReality) {
       case 'ar':
@@ -80,8 +90,21 @@ AFRAME.registerSystem('store', {
         document.getElementById('comments').style.display = 'none';
         document.getElementById('thumbs').classList.add('ar');
         document.getElementById('buttonCart').classList.add('ar');
-        document.getElementById('container').classList.add('ar');
         document.getElementById('footer').style.display = 'none';
+        if (!this.pinSelected) {
+          document.getElementById('arui').style.display = 'block';
+          document.getElementById('header').style.display = 'none';
+          document.getElementById('productOptions').style.display = 'none';
+          document.getElementById('buttonCart').style.display = 'none';
+          this.meshContainer.setAttribute('visible', false);
+        } else {
+          document.getElementById('productOptions').style.display = 'flex';
+          document.getElementById('container').classList.add('ar');
+        }
+        if(this.pinDetected){
+          this.planeDetected();
+        }
+
         break;
       case 'magicWindow':
         document.getElementById('header').classList.remove('ar');
@@ -100,6 +123,17 @@ AFRAME.registerSystem('store', {
         document.getElementById('buttonCart').classList.remove('ar');
         document.getElementById('container').classList.remove('ar');
         document.getElementById('footer').style.display = 'block';
+
+        document.getElementById('header').style.display = 'block';
+        document.getElementById('productOptions').style.display = 'block';
+        document.getElementById('buttonCart').style.display = 'block';
+
+        document.getElementById('arui').style.display = 'none';
+        this.meshContainer.setAttribute('visible', true);
+        this.meshContainer.setAttribute('position', this.meshContainerOrigPosition);
+        this.pinSelected = false;
+        this.reticleParent.appendChild(this.reticle);
+        this.reticle.setAttribute('visible', false);
         break;
       case 'vr':
         
@@ -459,13 +493,45 @@ AFRAME.registerSystem('store', {
       parent: uiEl
     });
   },
-  addNewStyles: function (){
+  xrInitialized: function (){
     if (AFRAME.utils.getUrlParameter('ui') === 'false') {
       return;
     }
     // Add styles to support multiple buttons and to have consistent design
     var sheet = document.createElement('style');
-    sheet.innerHTML = '.a-enter-vr-button {background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjIwNDhweCIgaGVpZ2h0PSIyMDQ4cHgiIHZpZXdCb3g9IjAgMCAyMDQ4IDIwNDgiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDIwNDggMjA0OCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHRpdGxlPm1hc2s8L3RpdGxlPjxjaXJjbGUgb3BhY2l0eT0iMC40IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3ICAgICIgY3g9IjEwMjQiIGN5PSIxMDI0IiByPSI4ODMuNTg4Ii8+PGc+PGc+PHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTYwOS4xMDcsNjI1Ljc2OGg0MDIuOTY4djc0LjcwN0g2NzYuNzgzdjI4My40NDdoLTY3LjY3NlY2MjUuNzY4eiIvPjwvZz48Zz48cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMTQzOC44OTMsMTQyMi4yMzJoLTQwMi45Njl2LTc0LjcwN2gzMzUuMjkzdi0yODMuNDQ2aDY3LjY3NlYxNDIyLjIzMnoiLz48L2c+PC9nPjwvc3ZnPg==) 100% 100%/100% 100% no-repeat;';
+    sheet.innerHTML = '.a-enter-ar-button {background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjIwNDhweCIgaGVpZ2h0PSIyMDQ4cHgiIHZpZXdCb3g9IjAgMCAyMDQ4IDIwNDgiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDIwNDggMjA0OCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHRpdGxlPm1hc2s8L3RpdGxlPjxjaXJjbGUgb3BhY2l0eT0iMC40IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3ICAgICIgY3g9IjEwMjQiIGN5PSIxMDI0IiByPSI4ODMuNTg4Ii8+PGc+PHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTg0Ny43NjEsMTMxNi40OTh2LTcxLjFoNjkuM2wtMzYtOTcuMTk5SDY0NS4yNjJsLTM4LjY5OSw5Ny4xOTloNzYuNXY3MS4xaC0yMTMuM3YtNzEuMWg1NGwxODQuNDk5LTQ0Mi43OTdoLTkwdi03MS4xMDFoMTc2LjM5OWwyMTAuNTk5LDUxMy44OTdoNTcuNjAxdjcxLjFIODQ3Ljc2MXogTTc2OC41NjIsODQ5LjQwMWgtNS40bC05My42LDIzNy41OThIODU3LjY2TDc2OC41NjIsODQ5LjQwMXoiLz48cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMTQ4NC4wNSwxMzE2LjQ5OGwtMTIzLjI5OS0yMzguNDk5aC0xMTEuNnYxNjcuMzk5aDczLjh2NzEuMWgtMjI2Ljc5OXYtNzEuMWg3MS4xVjgwMi42MDJoLTcxLjF2LTcxLjEwMWgyNTYuNDk5YzE0NC44OTcsMCwyMDkuNjk4LDY3LjUsMjA5LjY5OCwxNjkuMTk5YzAsNzYuNS00NC4xMDEsMTM4LjU5OS0xMjEuNSwxNjEuMDk5bDk3LjE5OSwxODMuNjAxaDcyLjg5OXY3MS4xTDE0ODQuMDUsMTMxNi40OThMMTQ4NC4wNSwxMzE2LjQ5OHogTTEzNDAuMDUxLDgwMi42MDJoLTkwLjg5OHYyMDguNzk4aDkxLjhjOTguMSwwLDEzNC4wOTktNDAuNSwxMzQuMDk5LTEwOC44OTlDMTQ3NS4wNSw4MzEuNDAxLDE0MzcuMjUsODAyLjYwMiwxMzQwLjA1MSw4MDIuNjAyeiIvPjwvZz48L3N2Zz4=) 100% 100%/100% 100% no-repeat;';
+    sheet.innerHTML += 'border: 0;';
+    sheet.innerHTML += 'bottom: 0;';
+    sheet.innerHTML += 'cursor: pointer;';
+    sheet.innerHTML += 'min-width: 40px;';
+    sheet.innerHTML += 'min-height: 40px;';
+    sheet.innerHTML += 'padding-right: 5%;';
+    sheet.innerHTML += 'padding-top: 4%;';
+    sheet.innerHTML += 'position: absolute;';
+    sheet.innerHTML += 'right: 0;';
+    sheet.innerHTML += 'z-index: 9999;';
+    sheet.innerHTML += 'margin-right: 5px;}';
+    sheet.innerHTML += '.a-enter-ar-button:active,.a-enter-ar-button:hover {opacity: 0.5}';
+
+    sheet.innerHTML += '.a-exit-ar-button {background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjIwNDhweCIgaGVpZ2h0PSIyMDQ4cHgiIHZpZXdCb3g9IjAgMCAyMDQ4IDIwNDgiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDIwNDggMjA0OCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHRpdGxlPm1hc2s8L3RpdGxlPjxjaXJjbGUgb3BhY2l0eT0iMC40IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3ICAgICIgY3g9IjEwMjQiIGN5PSIxMDI0IiByPSI4ODMuNTg4Ii8+PGc+PHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTEwOTUuMTA0LDEzMTYuNDk4di03MS4xaDYzLjg5OWwtMTM1Ljg5OS0xNzYuMzk5bC0xMjcuNzk5LDE3Ni4zOTloNjIuOTk5djcxLjFINzQ0LjEwNXYtNzEuMWg2MS4xOTlsMTc2LjM5OS0yMzAuMzk5TDgxMi41MDUsODAyLjYwMmgtNTcuNnYtNzEuMTAxaDIwOS42OTh2NzEuMTAxaC01Ny42TDEwMzAuMzAzLDk2MWwxMTYuMS0xNTguMzk4aC01My45OTl2LTcxLjEwMWgyMDYuOTk4djcxLjEwMWgtNjIuMTAxTDEwNzEuNzAyLDEwMTMuMmwxODMuNTk5LDIzMi4xOTloNTR2NzEuMUwxMDk1LjEwNCwxMzE2LjQ5OEwxMDk1LjEwNCwxMzE2LjQ5OHoiLz48L2c+PC9zdmc+) 100% 100%/100% 100% no-repeat !important;';
+    sheet.innerHTML += 'border: 0;';
+    sheet.innerHTML += 'top: 20px;';
+    sheet.innerHTML += 'bottom: initial;';
+    sheet.innerHTML += 'position: fixed;';
+    sheet.innerHTML += 'left: 10px;';
+    sheet.innerHTML += 'cursor: pointer;';
+    sheet.innerHTML += 'min-width: 40px;';
+    sheet.innerHTML += 'min-height: 40px;';
+    sheet.innerHTML += 'padding-right: 5%;';
+    sheet.innerHTML += 'padding-top: 4%;';
+    sheet.innerHTML += 'transition: background-color .05s ease;';
+    sheet.innerHTML += '-webkit-transition: background-color .05s ease;';
+    sheet.innerHTML += 'z-index: 9999;';
+    sheet.innerHTML += 'display: none;';
+    sheet.innerHTML += 'margin-right: 0px;}';
+    sheet.innerHTML += '.a-enter-ar-button:active,.a-enter-ar-button:hover {opacity: 0.5}';
+
+    sheet.innerHTML += '.a-enter-vr-button {background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjIwNDhweCIgaGVpZ2h0PSIyMDQ4cHgiIHZpZXdCb3g9IjAgMCAyMDQ4IDIwNDgiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDIwNDggMjA0OCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHRpdGxlPm1hc2s8L3RpdGxlPjxjaXJjbGUgb3BhY2l0eT0iMC40IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3ICAgICIgY3g9IjEwMjQiIGN5PSIxMDI0IiByPSI4ODMuNTg4Ii8+PGc+PGc+PHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTYwOS4xMDcsNjI1Ljc2OGg0MDIuOTY4djc0LjcwN0g2NzYuNzgzdjI4My40NDdoLTY3LjY3NlY2MjUuNzY4eiIvPjwvZz48Zz48cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMTQzOC44OTMsMTQyMi4yMzJoLTQwMi45Njl2LTc0LjcwN2gzMzUuMjkzdi0yODMuNDQ2aDY3LjY3NlYxNDIyLjIzMnoiLz48L2c+PC9nPjwvc3ZnPg==) 100% 100%/100% 100% no-repeat;';
     sheet.innerHTML += 'border: 0;';
     sheet.innerHTML += 'bottom: 0;';
     sheet.innerHTML += 'cursor: pointer;';
@@ -478,7 +544,6 @@ AFRAME.registerSystem('store', {
     sheet.innerHTML += 'z-index: 9999;';
     sheet.innerHTML += 'margin-right: 5px;}';
     sheet.innerHTML += '.a-enter-vr-button:active,.a-enter-vr-button:hover {background-color: rgba(0,0,0,0);opacity: 0.5}';
-
     document.body.appendChild(sheet);
   },
   replaceVRIcon: function () {
@@ -498,5 +563,37 @@ AFRAME.registerSystem('store', {
     sheet.innerHTML += '.a-enter-vr-button:active,.a-enter-vr-button:hover {background-color: rgba(0,0,0,0);opacity: 0.5}';
 
     document.body.appendChild(sheet);
+  },
+  planeDetected: function () {
+    console.log('----- plane detected', this.pinDetected, this.pinSelected);
+    if (this.pinSelected) {
+      this.showARUI();
+    } else {
+      if (!this.pinDetected) {
+        this.pinDetected = true;
+        document.querySelector('#arui-step1').style.display = 'none';
+        document.querySelector('#arui-step2').style.display = 'block';
+      } else {
+        this.reticle.addEventListener('touched', this.touched);
+      }
+    }
+  },
+  touched: function (evt) {
+    if (evt.detail.target.type !== 'submit') {
+      this.pinSelected = true;
+      this.reticleParent = this.reticle.parentNode;
+      this.reticle.parentNode.removeChild(this.reticle);
+      this.meshContainer.setAttribute('visible', true);
+      this.meshContainer.setAttribute('position', this.reticle.getAttribute('position'));
+      this.showARUI();
+    }
+    this.reticle.removeEventListener('touched', this.touched);
+  },
+  showARUI: function () {
+    document.getElementById('arui').style.display = 'none';
+    document.getElementById('header').style.display = 'block';
+    document.getElementById('productOptions').style.display = 'flex';
+    document.getElementById('buttonCart').style.display = 'block';
+    document.getElementById('container').classList.add('ar');
   }
 });

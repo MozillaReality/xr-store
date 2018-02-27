@@ -15,6 +15,6 @@ AFRAME.registerComponent('store-controls', {
       // console.log('----');
       self.touchStarted = true;
     });
-    document.getElementById('acamera').setAttribute('orbit-controls', 'position', '0 0.5 0');
+    // document.getElementById('acamera').setAttribute('orbit-controls', 'position', '0 0.5 0');
   }
 });
