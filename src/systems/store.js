@@ -589,10 +589,18 @@ AFRAME.registerSystem('store', {
     if (this.hasVRDisplays) {
       this.replaceVRIcon();
     }
+    if (this.el.sceneEl.renderer.xr.totalSupportedDisplays) {
+      this.showVRIcon();
+    }
   },
   hideVRIcon: function (){
     var sheet = document.createElement('style');
     sheet.innerHTML = '.a-enter-vr {display: none;}';
+    document.body.appendChild(sheet);
+  },
+  showVRIcon: function (){
+    var sheet = document.createElement('style');
+    sheet.innerHTML = '.a-enter-vr {display: block;}';
     document.body.appendChild(sheet);
   },
   replaceVRIcon: function () {
