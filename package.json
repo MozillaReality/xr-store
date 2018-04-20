@@ -24,6 +24,6 @@
     "webpack-dev-server": "^1.16.1"
   },
   "dependencies": {
-    "aframe-xr": "0.0.9"
+    "aframe-xr": "0.0.11"
   }
 }
